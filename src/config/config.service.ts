@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
 export class ConfigService {
     private readonly envConfig: { [key: string]: any } = null;
 
