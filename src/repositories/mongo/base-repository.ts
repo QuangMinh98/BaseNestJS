@@ -56,7 +56,6 @@ export abstract class BaseRepository<T extends Document> {
         return this._repository.find(
             entityFilterQuery,
             {
-                _id: 0,
                 _v: 0,
                 ...projection
             },
