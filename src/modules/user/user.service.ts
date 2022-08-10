@@ -33,7 +33,7 @@ export class UserService {
     }
 
     async findOne(id: string) {
-        const user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findById(id, { password: 0 });
         if (!user) throw new NotFoundException({ errorCode: 404, errorMessage: 'User not found!' });
 
         return user;

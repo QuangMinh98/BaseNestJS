@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 import { QueryDto } from './dto/query.dto';
 import { ParseObjectIdPipe } from 'src/common/pipes/parseObjectId.pipe';
+import { User } from 'src/common/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/modules/auth/guard/jwt-auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -18,6 +20,12 @@ export class UserController {
     @Get()
     findAllAndPaging(@Query(ValidationPipe) query: QueryDto) {
         return this.userService.findAllAndPaging(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('me')
+    findMe(@User() user: reqUser) {
+        return this.userService.findOne(user.id);
     }
 
     @Get(':id')

@@ -72,7 +72,6 @@ export abstract class BaseRepository<T extends Document> {
         projection?: Record<string, unknown>
     ): Query<resultType<T>[], resultType<T>> {
         return this._repository.find(entityFilterQuery, {
-            _id: 0,
             _v: 0,
             ...projection
         });
@@ -83,7 +82,6 @@ export abstract class BaseRepository<T extends Document> {
         projection?: Record<string, unknown>
     ): Query<resultType<T>, resultType<T>> {
         return this._repository.findOne(entityFilterQuery, {
-            _id: 0,
             _v: 0,
             ...projection
         });
@@ -91,7 +89,6 @@ export abstract class BaseRepository<T extends Document> {
 
     findById(_id: string, projection?: Record<string, unknown>): Query<resultType<T>, resultType<T>> {
         return this._repository.findById(_id, {
-            _id: 0,
             _v: 0,
             ...projection
         });
