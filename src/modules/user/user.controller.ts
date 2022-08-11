@@ -7,7 +7,9 @@ import { QueryDto } from './dto/query.dto';
 import { ParseObjectIdPipe } from 'src/common/pipes/parseObjectId.pipe';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guard/jwt-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
