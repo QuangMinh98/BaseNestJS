@@ -10,7 +10,7 @@ export class UserRepository extends BaseRepository<UserDocument> {
         super(userModel);
     }
 
-    findByEmail(email: string) {
-        return this.findOne({ email });
+    findByEmail(email: string, projection?: Record<string, unknown>) {
+        return this.findOne({ email }, projection);
     }
 }
