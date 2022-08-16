@@ -24,6 +24,10 @@ export abstract class BaseRepository<T extends Document> {
         this._repository = model;
     }
 
+    get name() {
+        return this._repository.collection.name;
+    }
+
     countDocuments(
         entityFilterQuery?: FilterQuery<T>,
         options?: QueryOptions<T>

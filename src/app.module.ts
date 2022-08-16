@@ -8,9 +8,10 @@ import { MongoModule } from './database/mongo/mongo.module';
 import { UserModule } from './modules/user/user.module';
 import { MongoRepositoryModule } from './repositories/mongo';
 import { AuthModule } from './modules/auth/auth.module';
+import { RedisModule } from './database/redis';
 
 @Module({
-    imports: [MorganModule, ConfigModule, MongoModule, MongoRepositoryModule, UserModule, AuthModule],
+    imports: [MorganModule, ConfigModule, MongoModule, RedisModule, MongoRepositoryModule, UserModule, AuthModule],
     controllers: [AppController],
     providers: [
         AppService,

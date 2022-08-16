@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from 'src/config';
+import { mongoProviders } from './mongo.provider';
 
 @Global()
 @Module({
@@ -12,7 +13,7 @@ import { ConfigService } from 'src/config';
             inject: [ConfigService]
         })
     ],
-    providers: [],
+    providers: [...mongoProviders],
     exports: [MongooseModule]
 })
 export class MongoModule {}
