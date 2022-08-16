@@ -8,7 +8,10 @@ export class ConfigService {
         this.envConfig = {
             nodeEnvironment: process.env.NODE_ENV,
             jwtKey: process.env.JWT_KEY,
-            connectionString: process.env.CONNECTION_STRING
+            connectionString: process.env.CONNECTION_STRING,
+            redisHost: process.env.REDIS_HOST,
+            redisPort: process.env.REDIS_PORT,
+            redisPassword: process.env.REDIS_PASSWORD
         };
     }
 
