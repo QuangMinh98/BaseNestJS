@@ -1,4 +1,3 @@
-import { CACHE_MANAGER, Inject } from '@nestjs/common';
 import mongoose from 'mongoose';
 import { RedisService } from '../redis/redis.service';
 
