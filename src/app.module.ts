@@ -9,9 +9,19 @@ import { UserModule } from './modules/user/user.module';
 import { MongoRepositoryModule } from './repositories/mongo';
 import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './database/redis';
+import { TaskModule } from './task/task.module';
 
 @Module({
-    imports: [MorganModule, ConfigModule, MongoModule, RedisModule, MongoRepositoryModule, UserModule, AuthModule],
+    imports: [
+        MorganModule,
+        ConfigModule,
+        MongoModule,
+        RedisModule,
+        MongoRepositoryModule,
+        TaskModule,
+        UserModule,
+        AuthModule
+    ],
     controllers: [AppController],
     providers: [
         AppService,
