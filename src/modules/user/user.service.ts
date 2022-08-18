@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 import { IResponse } from 'src/common/interface/response.inteface';
 import { RedisService } from 'src/database/redis/redis.service';
 import { UserRepository } from 'src/repositories/mongo';
@@ -6,15 +8,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { QueryDto } from './dto/query.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
-    constructor(
-        private readonly userRepository: UserRepository,
-        private readonly redisService: RedisService,
-        private schedulerRegistry: SchedulerRegistry
-    ) {}
+    constructor(private readonly userRepository: UserRepository, private readonly redisService: RedisService) {}
 
     async create(createUserDto: CreateUserDto) {
         const newUser = await this.userRepository.create(createUserDto);
