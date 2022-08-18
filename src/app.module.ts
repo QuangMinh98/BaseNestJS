@@ -10,6 +10,7 @@ import { MongoRepositoryModule } from './repositories/mongo';
 import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './database/redis';
 import { TaskModule } from './task/task.module';
+import { QueueModule } from './queue';
 
 @Module({
     imports: [
