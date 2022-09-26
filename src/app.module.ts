@@ -11,6 +11,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './database/redis';
 import { TaskModule } from './task/task.module';
 import { QueueModule } from './queue';
+import { CityModule } from './modules/city/city.module';
+import { DistrictModule } from './modules/district/district.module';
+import { StreetModule } from './modules/street/street.module';
+import { ProjectModule } from './modules/project/project.module';
+import { RealEstateModule } from './modules/real-estate/real-estate.module';
+import { CrawlerModule } from './modules/crawler/crawler.module';
+import { WardModule } from './modules/ward/ward.module';
 
 @Module({
     imports: [
@@ -18,10 +25,16 @@ import { QueueModule } from './queue';
         ConfigModule,
         MongoModule,
         RedisModule,
-        MongoRepositoryModule,
         TaskModule,
         UserModule,
-        AuthModule
+        AuthModule,
+        CityModule,
+        DistrictModule,
+        StreetModule,
+        ProjectModule,
+        RealEstateModule,
+        CrawlerModule,
+        WardModule
     ],
     controllers: [AppController],
     providers: [
