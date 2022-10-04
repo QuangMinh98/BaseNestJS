@@ -33,6 +33,10 @@ export class CacheInterceptor implements NestInterceptor {
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
         const cacheKey = this.reflector.get(CACHE_KEY_METADATA, context.getHandler());
         const cacheTime = this.reflector.get(CACHE_TIME_METADATA, context.getHandler()) || 6000;
+        const reqUrl = this.trackBy(context);
+
+        // If request method isn't GET
+        if (!reqUrl) return next.handle();
 
         const key = cacheKey + '-' + this.trackBy(context);
 
@@ -40,7 +44,6 @@ export class CacheInterceptor implements NestInterceptor {
         const cacheValue = await this.redisService.get(key);
 
         // If data already existed in cache
-        // It will map these data to the document type
         if (cacheValue) {
             console.log('Get data from redis');
             return of(cacheValue);
