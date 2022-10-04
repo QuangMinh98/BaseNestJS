@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { ConfigService } from 'src/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserModule } from '../user';
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
                 signOptions: { expiresIn: '60m' }
             }),
             inject: [ConfigService]
-        })
+        }),
+        UserModule
     ],
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy, JwtStrategy]

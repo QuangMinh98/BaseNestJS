@@ -5,24 +5,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { MongoModule } from './database/mongo/mongo.module';
-import { UserModule } from './modules/user/user.module';
-import { MongoRepositoryModule } from './repositories/mongo';
-import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user';
+import { AuthModule } from './modules/auth';
 import { RedisModule } from './database/redis';
 import { TaskModule } from './task/task.module';
 import { QueueModule } from './queue';
 
 @Module({
-    imports: [
-        MorganModule,
-        ConfigModule,
-        MongoModule,
-        RedisModule,
-        MongoRepositoryModule,
-        TaskModule,
-        UserModule,
-        AuthModule
-    ],
+    imports: [MorganModule, ConfigModule, MongoModule, RedisModule, TaskModule, UserModule, AuthModule],
     controllers: [AppController],
     providers: [
         AppService,

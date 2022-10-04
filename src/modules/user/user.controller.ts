@@ -1,13 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Query, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Put, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ValidationPipe } from 'src/common/pipes/validation.pipe';
 import { QueryDto } from './dto/query.dto';
-import { ParseObjectIdPipe } from 'src/common/pipes/parseObjectId.pipe';
-import { User } from 'src/common/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/modules/auth/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, CacheKey, ParseObjectIdPipe, User, ValidationPipe } from 'src/common';
+import { USER_CACHE_KEY } from './user.constant';
 
 @ApiTags('User')
 @Controller('users')
@@ -20,6 +19,8 @@ export class UserController {
     }
 
     @Get()
+    @UseInterceptors(CacheInterceptor)
+    @CacheKey(USER_CACHE_KEY)
     findAllAndPaging(@Query(ValidationPipe) query: QueryDto) {
         return this.userService.findAllAndPaging(query);
     }
@@ -31,6 +32,8 @@ export class UserController {
     }
 
     @Get(':id')
+    @UseInterceptors(CacheInterceptor)
+    @CacheKey(USER_CACHE_KEY)
     findOne(@Param('id', ParseObjectIdPipe) id: string) {
         return this.userService.findOne(id);
     }
