@@ -1,12 +1,11 @@
+import { NotFoundException } from '@nestjs/common';
 import {
     AnyKeys,
     Document,
     FilterQuery,
-    HydratedDocument,
     InsertManyOptions,
     MergeType,
     Model,
-    Query,
     QueryOptions,
     RequireOnlyTypedId,
     Types,
@@ -14,8 +13,6 @@ import {
     UpdateWithAggregationPipeline,
     UpdateWriteOpResult
 } from 'mongoose';
-
-type resultType<T> = T & Document & { _id: Types.ObjectId };
 
 export abstract class BaseRepository<T extends Document> {
     private _repository: Model<T>;
@@ -28,18 +25,15 @@ export abstract class BaseRepository<T extends Document> {
         return this._repository.collection.name;
     }
 
-    countDocuments(
-        entityFilterQuery?: FilterQuery<T>,
-        options?: QueryOptions<T>
-    ): Query<number, HydratedDocument<T, any, any>, any, T> {
+    async countDocuments(entityFilterQuery?: FilterQuery<T>, options?: QueryOptions<T>): Promise<number> {
         return this._repository.countDocuments(entityFilterQuery, options);
     }
 
-    create(...docs: (T | AnyKeys<T>)[]): Promise<HydratedDocument<T, any, any>[]> {
+    async create(...docs: (T | AnyKeys<T>)[]): Promise<T[]> {
         return this._repository.create(docs);
     }
 
-    insertMany(
+    async insertMany(
         docs: T[],
         options: InsertManyOptions & {
             lean: true;
@@ -48,12 +42,12 @@ export abstract class BaseRepository<T extends Document> {
         return this._repository.insertMany(docs, options);
     }
 
-    findAndPaging(
+    async findAndPaging(
         pagingOptions: { page: number; limit: number },
         entityFilterQuery?: FilterQuery<T>,
         projection?: Record<string, unknown>,
         options?: QueryOptions<T>
-    ): Query<resultType<T>[], resultType<T>> {
+    ): Promise<T[]> {
         const { page, limit } = pagingOptions;
         const skip = (page - 1) * limit;
 
@@ -71,66 +65,154 @@ export abstract class BaseRepository<T extends Document> {
         );
     }
 
-    find(
+    async find(
         entityFilterQuery?: FilterQuery<T>,
-        projection?: Record<string, unknown>
-    ): Query<resultType<T>[], resultType<T>> {
-        return this._repository.find(entityFilterQuery, {
-            _v: 0,
-            ...projection
-        });
+        projection?: Record<string, unknown>,
+        options?: QueryOptions<T>
+    ): Promise<T[]> {
+        return this._repository.find(
+            entityFilterQuery,
+            {
+                _v: 0,
+                ...projection
+            },
+            options
+        );
     }
 
-    findOne(
+    async findAndCountAll(
         entityFilterQuery?: FilterQuery<T>,
-        projection?: Record<string, unknown>
-    ): Query<resultType<T>, resultType<T>> {
-        return this._repository.findOne(entityFilterQuery, {
-            _v: 0,
-            ...projection
-        });
+        projection?: Record<string, unknown>,
+        options?: QueryOptions<T>
+    ): Promise<{
+        rows: T[];
+        totalDocuments: number;
+    }> {
+        const [rows, totalDocuments] = await Promise.all([
+            this.find(entityFilterQuery, projection, options),
+            this.countDocuments(entityFilterQuery)
+        ]);
+
+        return { rows, totalDocuments };
     }
 
-    findById(_id: string, projection?: Record<string, unknown>): Query<resultType<T>, resultType<T>> {
-        return this._repository.findById(_id, {
-            _v: 0,
-            ...projection
-        });
+    async findOneOrFailed(
+        entityFilterQuery?: FilterQuery<T>,
+        projection?: Record<string, unknown>,
+        options?: QueryOptions<T>,
+        objectOrError?: any
+    ): Promise<T> {
+        const data = await this.findOne(entityFilterQuery, projection, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
     }
 
-    findByIdAndUpdate(
+    async findByIdOrFailed(
+        _id: string,
+        projection?: Record<string, unknown>,
+        options?: QueryOptions<T>,
+        objectOrError?: any
+    ): Promise<T> {
+        const data = await this.findById(_id, projection, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
+    }
+
+    async findByIdAndUpdateOrFailed(
         _id: string,
         update?: UpdateQuery<T>,
+        options?: QueryOptions<T>,
+        objectOrError?: any
+    ): Promise<T> {
+        const data = await this.findByIdAndUpdate(_id, update, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
+    }
+
+    async findOneAndUpdateOrFailed(
+        filter?: FilterQuery<T>,
+        update?: UpdateQuery<T>,
+        options?: QueryOptions<T>,
+        objectOrError?: any
+    ): Promise<T> {
+        const data = await this.findOneAndUpdate(filter, update, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
+    }
+
+    async findByIdAndDeleteOrFailed(_id: string, options?: QueryOptions<T>, objectOrError?: any): Promise<T> {
+        const data = await this.findByIdAndDelete(_id, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
+    }
+
+    async findOneAndDeleteOrFailed(
+        filter?: FilterQuery<T>,
+        options?: QueryOptions<T>,
+        objectOrError?: any
+    ): Promise<T> {
+        const data = await this.findOneAndDelete(filter, options);
+        if (!data) throw new NotFoundException(objectOrError);
+
+        return data;
+    }
+
+    async findOne(
+        entityFilterQuery?: FilterQuery<T>,
+        projection?: Record<string, unknown>,
         options?: QueryOptions<T>
-    ): Query<resultType<T>, resultType<T>> {
+    ): Promise<T> {
+        return this._repository.findOne(
+            entityFilterQuery,
+            {
+                _v: 0,
+                ...projection
+            },
+            options
+        );
+    }
+
+    async findById(_id: string, projection?: Record<string, unknown>, options?: QueryOptions<T>): Promise<T> {
+        return this._repository.findById(
+            _id,
+            {
+                _v: 0,
+                ...projection
+            },
+            options
+        );
+    }
+
+    async findByIdAndUpdate(_id: string, update?: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T> {
         return this._repository.findByIdAndUpdate(_id, update, options);
     }
 
-    findOneAndUpdate(
-        filter?: FilterQuery<T>,
-        update?: UpdateQuery<T>,
-        options?: QueryOptions<T>
-    ): Query<resultType<T>, resultType<T>> {
+    async findOneAndUpdate(filter?: FilterQuery<T>, update?: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T> {
         return this._repository.findOneAndUpdate(filter, update, options);
     }
 
-    findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions<T>) {
+    async findOneAndDelete(filter?: FilterQuery<T>, options?: QueryOptions<T>): Promise<T> {
         return this._repository.findOneAndDelete(filter, options);
     }
 
-    findByIdAndDelete(_id: string, options?: QueryOptions<T>) {
+    async findByIdAndDelete(_id: string, options?: QueryOptions<T>): Promise<T> {
         return this._repository.findByIdAndDelete(_id, options);
     }
 
-    updateMany(
+    async updateMany(
         filter?: FilterQuery<T>,
         update?: UpdateWithAggregationPipeline | UpdateQuery<T>,
         options?: QueryOptions<T>
-    ): Query<UpdateWriteOpResult, HydratedDocument<T, any, any>, any, T> {
+    ): Promise<UpdateWriteOpResult> {
         return this._repository.updateMany(filter, update, options);
     }
 
-    deleteMany(filter?: FilterQuery<T>, options?: QueryOptions<T>) {
+    async deleteMany(filter?: FilterQuery<T>, options?: QueryOptions<T>) {
         return this._repository.deleteMany(filter, options);
     }
 }
