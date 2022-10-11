@@ -37,21 +37,23 @@ export class UserService {
     }
 
     async findOne(id: string) {
-        const user = await this.userRepository.findById(id, { password: 0 });
-        if (!user) throw new NotFoundException({ errorCode: 404, errorMessage: 'User not found!' });
+        const err = { errorCode: 404, errorMessage: 'User not found!' };
+        const user = await this.userRepository.findByIdOrFailed(id, { password: 0 }, null, err);
 
         return user;
     }
 
     async update(id: string, updateUserDto: UpdateUserDto) {
-        const user = await this.userRepository.findByIdAndUpdate(id, updateUserDto, { new: true });
+        const err = { errorCode: 404, errorMessage: 'User not found!' };
+        const user = await this.userRepository.findByIdAndUpdateOrFailed(id, updateUserDto, { new: true }, err);
         this.redisService.delStartWith(USER_CACHE_KEY);
 
         return user;
     }
 
     async remove(id: string) {
-        const user = await this.userRepository.findByIdAndDelete(id);
+        const err = { errorCode: 404, errorMessage: 'User not found!' };
+        const user = await this.userRepository.findByIdAndDeleteOrFailed(id, null, err);
         this.redisService.delStartWith(USER_CACHE_KEY);
 
         return user;

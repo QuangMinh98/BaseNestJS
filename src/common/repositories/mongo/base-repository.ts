@@ -8,7 +8,6 @@ import {
     Model,
     QueryOptions,
     RequireOnlyTypedId,
-    Types,
     UpdateQuery,
     UpdateWithAggregationPipeline,
     UpdateWriteOpResult
@@ -100,10 +99,10 @@ export abstract class BaseRepository<T extends Document> {
         entityFilterQuery?: FilterQuery<T>,
         projection?: Record<string, unknown>,
         options?: QueryOptions<T>,
-        objectOrError?: any
+        err?: any
     ): Promise<T> {
         const data = await this.findOne(entityFilterQuery, projection, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
@@ -112,10 +111,10 @@ export abstract class BaseRepository<T extends Document> {
         _id: string,
         projection?: Record<string, unknown>,
         options?: QueryOptions<T>,
-        objectOrError?: any
+        err?: any
     ): Promise<T> {
         const data = await this.findById(_id, projection, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
@@ -124,10 +123,10 @@ export abstract class BaseRepository<T extends Document> {
         _id: string,
         update?: UpdateQuery<T>,
         options?: QueryOptions<T>,
-        objectOrError?: any
+        err?: any
     ): Promise<T> {
         const data = await this.findByIdAndUpdate(_id, update, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
@@ -136,28 +135,24 @@ export abstract class BaseRepository<T extends Document> {
         filter?: FilterQuery<T>,
         update?: UpdateQuery<T>,
         options?: QueryOptions<T>,
-        objectOrError?: any
+        err?: any
     ): Promise<T> {
         const data = await this.findOneAndUpdate(filter, update, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
 
-    async findByIdAndDeleteOrFailed(_id: string, options?: QueryOptions<T>, objectOrError?: any): Promise<T> {
+    async findByIdAndDeleteOrFailed(_id: string, options?: QueryOptions<T>, err?: any): Promise<T> {
         const data = await this.findByIdAndDelete(_id, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
 
-    async findOneAndDeleteOrFailed(
-        filter?: FilterQuery<T>,
-        options?: QueryOptions<T>,
-        objectOrError?: any
-    ): Promise<T> {
+    async findOneAndDeleteOrFailed(filter?: FilterQuery<T>, options?: QueryOptions<T>, err?: any): Promise<T> {
         const data = await this.findOneAndDelete(filter, options);
-        if (!data) throw new NotFoundException(objectOrError);
+        if (!data) throw new NotFoundException(err);
 
         return data;
     }
